@@ -27,21 +27,21 @@ class VisualizeDataset:
     colors = ['r', 'g', 'b', 'c', 'm', 'y', 'k']
 
     # Set some initial attributes to define and create a save location for the images.
-    def __init__(self, module_path='.py'):
-        subdir = Path(module_path).name.split('.')[0]
-
+    def __init__(self, module_path):
+        # subdir = Path(module_path).name.split('.')[0]
+        subdir = module_path
         self.plot_number = 1
         self.figures_dir = Path('figures') / subdir
         self.figures_dir.mkdir(exist_ok=True, parents=True)
 
 
-    def save(self, plot_obj, formats=('png', 'pdf')): # 'svg'
+    def save(self, plot_obj, formats=('eps', 'png')): # 'svg'
 
         fig_name = f'figure_{self.plot_number}'
 
         for format in formats:
             save_path = self.figures_dir / f'{fig_name}.{format}'
-            plot_obj.savefig(save_path)
+            plot_obj.savefig(save_path, bbox_inches='tight', dpi=300)
             print(f'Figure saved to {save_path}')
 
         self.plot_number += 1
@@ -88,6 +88,7 @@ class VisualizeDataset:
             # Pass through the relevant columns.
             for j in range(0, len(relevant_cols)):
                 # Create a mask to ignore the NaN and Inf values when plotting:
+                print(relevant_cols[j])
                 mask = data_table[relevant_cols[j]].replace([np.inf, -np.inf], np.nan).notnull()
                 max_values.append(data_table[relevant_cols[j]][mask].max())
                 min_values.append(data_table[relevant_cols[j]][mask].min())
@@ -101,8 +102,9 @@ class VisualizeDataset:
                                 self.line_displays[j%len(self.line_displays)])
 
             xar[i].tick_params(axis='y', labelsize=10)
-            xar[i].legend(relevant_cols, fontsize='xx-small', numpoints=1, loc='upper center',
-                          bbox_to_anchor=(0.5, 1.3), ncol=len(relevant_cols), fancybox=True, shadow=True)
+            print(relevant_cols)
+            xar[i].legend(relevant_cols, fontsize='xx-small', numpoints=1, loc='lower center',
+                          bbox_to_anchor=(0.5, 1.0), ncol=len(relevant_cols), fancybox=True, shadow=True)
 
             xar[i].set_ylim([min(min_values) - 0.1*(max(max_values) - min(min_values)),
                              max(max_values) + 0.1*(max(max_values) - min(min_values))])
