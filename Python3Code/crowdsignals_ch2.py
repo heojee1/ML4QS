@@ -28,7 +28,7 @@ RESULT_FNAME = 'aggregated'
 
 # Set a granularity (the discrete step size of our time series data). We'll use a course-grained granularity of one
 # instance per minute, and a fine-grained one with four instances per second.
-GRANULARITIES = [750, 60000]
+GRANULARITIES = [400, 500]
 
 # We can call Path.mkdir(exist_ok=True) to make any required directories if they don't already exist.
 [path.mkdir(exist_ok=True, parents=True) for path in [DATASET_PATH, RESULT_PATH]]
@@ -75,8 +75,6 @@ for milliseconds_per_instance in GRANULARITIES:
         if c != 'Unnamed: 0' and not c.startswith('label'):
             dataset[c] = dataset[c].astype(float)
 
-    dataset.to_csv(RESULT_PATH / f'{RESULT_FNAME}_{milliseconds_per_instance}.csv')
-
     # Plot the data
     DataViz = VisualizeDataset(str(milliseconds_per_instance))
 
@@ -94,7 +92,7 @@ for milliseconds_per_instance in GRANULARITIES:
     datasets.append(copy.deepcopy(dataset))
 
     # If needed, we could save the various versions of the dataset we create in the loop with logical filenames:
-    # dataset.to_csv(RESULT_PATH / f'chapter2_result_{milliseconds_per_instance}')
+    dataset.to_csv(RESULT_PATH / f'chapter2_result_{milliseconds_per_instance}')
 
 
 # Make a table like the one shown in the book, comparing the two datasets produced.
