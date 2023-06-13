@@ -48,14 +48,14 @@ def main():
         raise e
 
     # We'll create an instance of our visualization class to plot the results.
-    DataViz = VisualizeDataset(__file__)
+    DataViz = VisualizeDataset(f'chapter3/{FLAGS.mode}')
 
 
 
     # Step 1: Let us see whether we have some outliers we would prefer to remove.
 
     # Determine the columns we want to experiment on.
-    outlier_columns = ['acc_phone_x', 'light_phone_lux']
+    outlier_columns = ['acc_x']
     # Create the outlier classes.
     OutlierDistr = DistributionBasedOutlierDetection()
     OutlierDist = DistanceBasedOutlierDetection()
@@ -79,7 +79,7 @@ def main():
         for col in outlier_columns:
 
             print(f"Applying mixture model for column {col}")
-            dataset = OutlierDistr.mixture_model(dataset, col)
+            dataset = OutlierDistr.mixture_model(dataset, col, int(FLAGS.C))
             DataViz.plot_dataset(dataset, [
                                  col, col + '_mixture'], ['exact', 'exact'], ['line', 'points'])
             # This requires:
@@ -147,7 +147,7 @@ if __name__ == '__main__':
     parser.add_argument('--fmin', type=float, default=0.99,
                         help="Simple distance based:  fmin is ... ")
     
-    parser.add_argument('--ms', type=int, default=250,
+    parser.add_argument('--ms', type=int, default=750,
                         help='Granularity: 250, 1000, 10000, 60000')
 
     FLAGS, unparsed = parser.parse_known_args()

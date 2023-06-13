@@ -22,10 +22,10 @@ from Chapter3.ImputationMissingValues import ImputationMissingValues
 from Chapter3.KalmanFilters import KalmanFilters
 
 # Set up the file names and locations.
-DATA_PATH = Path('./intermediate_datafiles/')    
+DATA_PATH = Path('./results/')    
 DATASET_FNAME = 'chapter3_result_outliers.csv'
 RESULT_FNAME = 'chapter3_result_final.csv'
-ORIG_DATASET_FNAME = 'chapter2_result.csv'
+ORIG_DATASET_FNAME = 'aggregated_750.csv'
 
 def print_flags():
     """
@@ -48,11 +48,13 @@ def main():
         raise e
 
     # We'll create an instance of our visualization class to plot the results.
-    DataViz = VisualizeDataset(__file__)
+    DataViz = VisualizeDataset('chpater3_rest')
 
     # Compute the number of milliseconds covered by an instance based on the first two rows
     milliseconds_per_instance = (
         dataset.index[1] - dataset.index[0]).microseconds/1000
+    
+    print(milliseconds_per_instance)
 
     MisVal = ImputationMissingValues()
     LowPass = LowPassFilter()
@@ -61,14 +63,14 @@ def main():
     if FLAGS.mode == 'imputation':
         # Let us impute the missing values and plot an example.
        
-        imputed_mean_dataset = MisVal.impute_mean(copy.deepcopy(dataset), 'hr_watch_rate')       
-        imputed_median_dataset = MisVal.impute_median(copy.deepcopy(dataset), 'hr_watch_rate')
-        imputed_interpolation_dataset = MisVal.impute_interpolate(copy.deepcopy(dataset), 'hr_watch_rate')
+        imputed_mean_dataset = MisVal.impute_mean(copy.deepcopy(dataset), 'press_x')       
+        imputed_median_dataset = MisVal.impute_median(copy.deepcopy(dataset), 'press_x')
+        imputed_interpolation_dataset = MisVal.impute_interpolate(copy.deepcopy(dataset), 'press_x')
         
-        DataViz.plot_imputed_values(dataset, ['original', 'mean', 'median', 'interpolation'], 'hr_watch_rate',
-                                    imputed_mean_dataset['hr_watch_rate'], 
-                                    imputed_median_dataset['hr_watch_rate'],
-                                    imputed_interpolation_dataset['hr_watch_rate'])
+        DataViz.plot_imputed_values(dataset, ['original', 'mean', 'median', 'interpolation'], 'press_x',
+                                    imputed_mean_dataset['press_x'], 
+                                    imputed_median_dataset['press_x'],
+                                    imputed_interpolation_dataset['press_x'])
 
     elif FLAGS.mode == 'kalman':
         # Using the result from Chapter 2, let us try the Kalman filter on the light_phone_lux attribute and study the result.
@@ -82,10 +84,10 @@ def main():
 
         KalFilter = KalmanFilters()
         kalman_dataset = KalFilter.apply_kalman_filter(
-            original_dataset, 'acc_phone_x')
+            original_dataset, 'acc_x')
         DataViz.plot_imputed_values(kalman_dataset, [
-                                    'original', 'kalman'], 'acc_phone_x', kalman_dataset['acc_phone_x_kalman'])
-        DataViz.plot_dataset(kalman_dataset, ['acc_phone_x', 'acc_phone_x_kalman'], [
+                                    'original', 'kalman'], 'acc_x', kalman_dataset['acc_x_kalman'])
+        DataViz.plot_dataset(kalman_dataset, ['acc_x', 'acc_x_kalman'], [
                              'exact', 'exact'], ['line', 'line'])
 
         # We ignore the Kalman filter output for now...
@@ -99,9 +101,9 @@ def main():
         cutoff = 1.5
         # Let us study acc_phone_x:
         new_dataset = LowPass.low_pass_filter(copy.deepcopy(
-            dataset), 'acc_phone_x', fs, cutoff, order=10)
+            dataset), 'acc_x', fs, cutoff, order=10)
         DataViz.plot_dataset(new_dataset.iloc[int(0.4*len(new_dataset.index)):int(0.43*len(new_dataset.index)), :],
-                             ['acc_phone_x', 'acc_phone_x_lowpass'], ['exact', 'exact'], ['line', 'line'])
+                             ['acc_x', 'acc_x_lowpass'], ['exact', 'exact'], ['line', 'line'])
 
     elif FLAGS.mode == 'PCA':
 
@@ -137,11 +139,14 @@ def main():
        
         for col in [c for c in dataset.columns if not 'label' in c]:
             dataset = MisVal.impute_interpolate(dataset, col)
+        # dataset.to_csv(DATA_PATH / RESULT_FNAME)
+        # return
 
         # And now let us include all LOWPASS measurements that have a form of periodicity (and filter them):
-        periodic_measurements = ['acc_phone_x', 'acc_phone_y', 'acc_phone_z', 'acc_watch_x', 'acc_watch_y', 'acc_watch_z', 'gyr_phone_x', 'gyr_phone_y',
-                                 'gyr_phone_z', 'gyr_watch_x', 'gyr_watch_y', 'gyr_watch_z', 'mag_phone_x', 'mag_phone_y', 'mag_phone_z', 'mag_watch_x',
-                                 'mag_watch_y', 'mag_watch_z']
+        periodic_measurements =  ['acc_x', 'acc_y', 'acc_z', 'gyr_x', 'gyr_y', 'gyr_z',
+                                    'lnac_x', 'lnac_y', 'lnac_z', 'mag_x', 'mag_y', 'mag_z', 'press_x',
+                                    'loc_latitude', 'loc_longitude', 'loc_height', 'loc_velocity',
+                                    'loc_direction', 'loc_horizontal', 'loc_vertical']
 
         
         # Let us apply a lowpass filter and reduce the importance of the data above 1.5 Hz
@@ -150,11 +155,11 @@ def main():
         fs = float(1000)/milliseconds_per_instance
         cutoff = 1.5
 
-        for col in periodic_measurements:
-            dataset = LowPass.low_pass_filter(
-                dataset, col, fs, cutoff, order=10)
-            dataset[col] = dataset[col + '_lowpass']
-            del dataset[col + '_lowpass']
+        # for col in periodic_measurements:
+        #     dataset = LowPass.low_pass_filter(
+        #         dataset, col, fs, cutoff, order=10)
+        #     dataset[col] = dataset[col + '_lowpass']
+        #     del dataset[col + '_lowpass']
 
         # We used the optimal found parameter n_pcs = 7, to apply PCA to the final dataset
        
@@ -165,10 +170,9 @@ def main():
         dataset = PCA.apply_pca(copy.deepcopy(dataset), selected_predictor_cols, n_pcs)
 
         # And the overall final dataset:
-        DataViz.plot_dataset(dataset, ['acc_', 'gyr_', 'hr_watch_rate', 'light_phone_lux', 'mag_', 'press_phone_', 'pca_', 'label'],
-                             ['like', 'like', 'like', 'like', 'like',
-                                 'like', 'like', 'like', 'like'],
-                             ['line', 'line', 'line', 'line', 'line', 'line', 'line', 'points', 'points'])
+        DataViz.plot_dataset(dataset, ['acc_', 'gyr_', 'lnac_', 'mag_', 'press_', 'loc_', 'pca_' ,  'label'],
+                                      ['like', 'like', 'like', 'like',  'like',   'like', 'like',   'like'],
+                                      ['line', 'line', 'line', 'line',  'line',   'line', 'points', 'points'])
 
         # Store the final outcome.
 
@@ -183,7 +187,7 @@ if __name__ == '__main__':
                         'lowpass' applies the lowpass-filter to a single variable \
                         'imputation' is used for the next chapter \
                         'PCA' is to study the effect of PCA and plot the results\
-                        'final' is used for the next chapter", choices=['lowpass', 'imputation', 'PCA', 'final'])
+                        'final' is used for the next chapter", choices=['lowpass', 'imputation', 'kalman', 'PCA', 'final'])
 
    
     FLAGS, unparsed = parser.parse_known_args()

@@ -75,19 +75,19 @@ for milliseconds_per_instance in GRANULARITIES:
         if c != 'Unnamed: 0' and not c.startswith('label'):
             dataset[c] = dataset[c].astype(float)
 
-    # dataset.to_csv(RESULT_PATH / f'{RESULT_FNAME}_{milliseconds_per_instance}.csv')
+    dataset.to_csv(RESULT_PATH / f'{RESULT_FNAME}_{milliseconds_per_instance}.csv')
 
     # Plot the data
-    # DataViz = VisualizeDataset(str(milliseconds_per_instance))
+    DataViz = VisualizeDataset(str(milliseconds_per_instance))
 
-    # # Boxplot
-    # DataViz.plot_dataset_boxplot(dataset, ['acc_x','acc_y','acc_z'])
-    # DataViz.plot_dataset_boxplot(dataset, ['gyr_x','gyr_y','gyr_z'])
+    # Boxplot
+    DataViz.plot_dataset_boxplot(dataset, ['acc_x','acc_y','acc_z'])
+    DataViz.plot_dataset_boxplot(dataset, ['gyr_x','gyr_y','gyr_z'])
 
-    # # Plot all data
-    # DataViz.plot_dataset(dataset, ['acc_', 'gyr_', 'lnac', 'mag_', 'press_', 'loc_', 'label'],
-    #                               ['like', 'like', 'like', 'like', 'like',   'like', 'like'],
-    #                               ['line', 'line', 'line', 'line', 'line',   'line', 'points'])
+    # Plot all data
+    DataViz.plot_dataset(dataset, ['acc_', 'gyr_', 'lnac', 'mag_', 'press_', 'loc_', 'label'],
+                                  ['like', 'like', 'like', 'like', 'like',   'like', 'like'],
+                                  ['line', 'line', 'line', 'line', 'line',   'line', 'points'])
 
     # And print a summary of the dataset.
     util.print_statistics(dataset)
