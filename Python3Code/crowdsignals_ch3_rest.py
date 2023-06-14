@@ -25,7 +25,7 @@ from Chapter3.KalmanFilters import KalmanFilters
 DATA_PATH = Path('./results/')    
 DATASET_FNAME = 'chapter3_result_outliers.csv'
 RESULT_FNAME = 'chapter3_result_final.csv'
-ORIG_DATASET_FNAME = 'aggregated_750.csv'
+ORIG_DATASET_FNAME = 'chapter2_result_400'
 
 def print_flags():
     """

@@ -23,7 +23,7 @@ import argparse
 # RESULT_FNAME = 'chapter3_result_outliers.csv'
 
 DATA_PATH = Path('./results/')
-DATASET_FNAME = 'aggregated'
+DATASET_FNAME = 'chapter2_result_400'
 RESULT_FNAME = 'chapter3_result_outliers.csv'
 
 
@@ -40,7 +40,7 @@ def main():
     print_flags() 
     # Next, import the data from the specified location and parse the date index.
     try:
-        dataset = pd.read_csv(Path(DATA_PATH / f'{DATASET_FNAME}_{FLAGS.ms}.csv'), index_col=0)
+        dataset = pd.read_csv(Path(DATA_PATH / DATASET_FNAME), index_col=0)
         dataset.index = pd.to_datetime(dataset.index)
 
     except IOError as e:
@@ -147,8 +147,8 @@ if __name__ == '__main__':
     parser.add_argument('--fmin', type=float, default=0.99,
                         help="Simple distance based:  fmin is ... ")
     
-    parser.add_argument('--ms', type=int, default=750,
-                        help='Granularity: 250, 1000, 10000, 60000')
+    # parser.add_argument('--ms', type=int, default=750,
+    #                     help='Granularity: 250, 1000, 10000, 60000')
 
     FLAGS, unparsed = parser.parse_known_args()
 
