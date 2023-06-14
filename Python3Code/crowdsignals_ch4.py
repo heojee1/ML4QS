@@ -23,6 +23,7 @@ from Chapter4.TextAbstraction import TextAbstraction
 # Read the result from the previous chapter, and make sure the index is of the type datetime.
 DATA_PATH = Path('./results/')
 DATASET_FNAME = 'chapter3_result_final.csv'
+#'chapter3_result_final_400_pry.csv'
 RESULT_FNAME = 'chapter4_result.csv'
 
 def print_flags():
@@ -77,6 +78,7 @@ def main():
        
         fs = float(1000)/milliseconds_per_instance
         ws = int(float(10000)/milliseconds_per_instance)
+        print(dataset)
         dataset = FreqAbs.abstract_frequency(dataset, ['acc_x'], ws, fs)
         # Spectral analysis.
         DataViz.plot_dataset(dataset, ['acc_x_max_freq', 'acc_x_freq_weighted', 'acc_x_pse', 'label'], ['like', 'like', 'like', 'like'], ['line', 'line', 'line','points'])
@@ -94,9 +96,7 @@ def main():
         dataset = NumAbs.abstract_numerical(dataset, selected_predictor_cols, ws, 'std')
         # TODO: Add your own aggregation methods here
         
-        DataViz.plot_dataset(dataset, ['acc_x', 'gyr_x', 'mag_x', 'press_', 'pca_1', 'label'], 
-                                      ['like', 'like',   'like',  'like',   'like',  'like'],
-                                      ['line', 'line',   'line',  'line',   'line',  'points'])
+        DataViz.plot_dataset(dataset, ['acc_x', 'gyr_x', 'lnac_x','mag_x', 'label'], ['like', 'like', 'like', 'like', 'like',], ['line', 'line', 'line', 'line', 'points'])
 
      
         CatAbs = CategoricalAbstraction()
@@ -104,19 +104,15 @@ def main():
         dataset = CatAbs.abstract_categorical(dataset, ['label'], ['like'], 0.03, int(float(5*60000)/milliseconds_per_instance), 2)
 
 
-        # periodic_predictor_cols = ['acc_phone_x'
-        #                             ,'acc_phone_y','acc_phone_z',
-        #                             'acc_watch_x','acc_watch_y','acc_watch_z','gyr_phone_x','gyr_phone_y',
-        #                         'gyr_phone_z','gyr_watch_x','gyr_watch_y','gyr_watch_z','mag_phone_x','mag_phone_y','mag_phone_z',
-        #                         'mag_watch_x','mag_watch_y','mag_watch_z']
-        
-        periodic_predictor_cols = ['acc_x', 'acc_y', 'acc_z', 'gyr_x', 'gyr_y', 'gyr_z',
-                                   'lnac_x', 'lnac_y', 'lnac_z', 'mag_x', 'mag_y', 'mag_z',]
-
+        periodic_predictor_cols = ['acc_x'
+                                    ,'acc_y','acc_z',
+                                    'gyr_x','gyr_y',
+                                'gyr_z','mag_x','mag_y','mag_z',
+                                'lnac_x','lnac_y','lnac_z']
 
 
         
-        # dataset = FreqAbs.abstract_frequency(copy.deepcopy(dataset), periodic_predictor_cols, int(float(10000)/milliseconds_per_instance), fs)
+        dataset = FreqAbs.abstract_frequency(copy.deepcopy(dataset), periodic_predictor_cols, int(float(10000)/milliseconds_per_instance), fs)
 
 
         # Now we only take a certain percentage of overlap in the windows, otherwise our training examples will be too much alike.
@@ -129,9 +125,7 @@ def main():
 
         dataset.to_csv(DATA_PATH / RESULT_FNAME)
 
-        DataViz.plot_dataset(dataset, ['acc_x', 'gyr_x', 'mag_x', 'press_', 'pca_1', 'label'], 
-                                      ['like',  'like',  'like',  'like',   'like',  'like'],
-                                      ['line',  'line',  'line',  'line',   'line',  'points'])
+        DataViz.plot_dataset(dataset, ['acc_x', 'gyr_x','lnac_x', 'mag_x', 'press_', 'pca_1', 'label'], ['like', 'like', 'like', 'like', 'like', 'like', 'like'], ['line', 'line', 'line', 'line', 'line', 'line', 'points'])
         print("--- %s seconds ---" % (time.time() - start_time))
   
 if __name__ == '__main__':

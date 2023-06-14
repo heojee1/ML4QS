@@ -144,9 +144,7 @@ def main():
 
         # And now let us include all LOWPASS measurements that have a form of periodicity (and filter them):
         periodic_measurements =  ['acc_x', 'acc_y', 'acc_z', 'gyr_x', 'gyr_y', 'gyr_z',
-                                    'lnac_x', 'lnac_y', 'lnac_z', 'mag_x', 'mag_y', 'mag_z', 'press_x',
-                                    'loc_latitude', 'loc_longitude', 'loc_height', 'loc_velocity',
-                                    'loc_direction', 'loc_horizontal', 'loc_vertical']
+                                    'lnac_x', 'lnac_y', 'lnac_z', 'mag_x', 'mag_y', 'mag_z']
 
         
         # Let us apply a lowpass filter and reduce the importance of the data above 1.5 Hz
@@ -155,11 +153,11 @@ def main():
         fs = float(1000)/milliseconds_per_instance
         cutoff = 1.5
 
-        # for col in periodic_measurements:
-        #     dataset = LowPass.low_pass_filter(
-        #         dataset, col, fs, cutoff, order=10)
-        #     dataset[col] = dataset[col + '_lowpass']
-        #     del dataset[col + '_lowpass']
+        for col in periodic_measurements:
+            dataset = LowPass.low_pass_filter(
+                dataset, col, fs, cutoff, order=10)
+            dataset[col] = dataset[col + '_lowpass']
+            del dataset[col + '_lowpass']
 
         # We used the optimal found parameter n_pcs = 7, to apply PCA to the final dataset
        
