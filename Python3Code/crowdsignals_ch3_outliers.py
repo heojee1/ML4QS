@@ -23,7 +23,7 @@ import argparse
 # RESULT_FNAME = 'chapter3_result_outliers.csv'
 
 DATA_PATH = Path('./results/')
-DATASET_FNAME = 'chapter2_result_400'
+DATASET_FNAME = 'chapter2_result_250.csv'
 RESULT_FNAME = 'chapter3_result_outliers.csv'
 
 

@@ -32,6 +32,8 @@ class FourierTransformation:
         # max
         max_freq = self.freqs[np.argmax(real_ampl[0:len(real_ampl)])]
         # weigthed
+        print(self.freqs.shape)
+        print(real_ampl.shape)
         freq_weigthed = float(np.sum(self.freqs * real_ampl)) / np.sum(real_ampl)
 
         # pse
